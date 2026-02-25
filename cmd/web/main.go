@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"net/http"
 	"os"
@@ -39,6 +40,14 @@ func (nfs neuteredFileSystem) Open(path string) (http.File, error) {
 }
 
 func main() {
+	defaultAddr := os.Getenv("SNIPPETBOX_ADDR")
+	if defaultAddr == "" {
+		defaultAddr = "127.0.0.1:4000"
+	}
+
+	addr := flag.String("addr", defaultAddr, "HTTP network address")
+	flag.Parse()
+
 	mux := http.NewServeMux()
 
 	fileServer := http.FileServer(neuteredFileSystem{http.Dir("./ui/static/")})
@@ -51,8 +60,8 @@ func main() {
 
 
 
-	log.Println("Starting server on :4000")
-	err := http.ListenAndServe("127.0.0.1:4000", mux)
+	log.Printf("Starting server on %s", *addr)
+	err := http.ListenAndServe(*addr, mux)
 	if err != nil {
 		log.Fatalf("Server failed to start: %v", err)
 	}
