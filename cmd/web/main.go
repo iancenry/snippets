@@ -48,7 +48,6 @@ func main() {
 	addr := flag.String("addr", defaultAddr, "HTTP network address")
 	flag.Parse()
 
-	// Custom loggers with color-coded output using ANSI escape codes
 	infoLog := log.New(os.Stdout, "\033[32mINFO\t\033[0m", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stderr, "\033[31mERROR\t\033[0m", log.Ldate|log.Ltime|log.LUTC|log.Lshortfile)
 
@@ -62,10 +61,15 @@ func main() {
 	mux.HandleFunc("/snippet/view/", snippetView) 
 	mux.HandleFunc("/snippet/create", snippetCreate)
 
+	srv := &http.Server{
+		Addr:     *addr,
+		ErrorLog: errorLog,
+		Handler:   mux,
+	}
 
 
 	infoLog.Printf("Starting server on %s", *addr)
-	err := http.ListenAndServe(*addr, mux)
+	err := srv.ListenAndServe()
 	if err != nil {
 		errorLog.Fatalf("Server failed to start: %v", err)
 	}
