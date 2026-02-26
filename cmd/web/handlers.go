@@ -9,13 +9,13 @@ import (
 
 func (app *application) home(w  http.ResponseWriter, r *http.Request){
 	if(r.URL.Path != "/"){
-		http.NotFound(w, r)
+		app.notFound(w)
 		return
 	}
 
 	if(r.Method != http.MethodGet){
 		w.Header().Set("Allow", http.MethodGet)
-		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		app.clientError(w, http.StatusMethodNotAllowed)
 		return
 	}
 
@@ -27,16 +27,13 @@ func (app *application) home(w  http.ResponseWriter, r *http.Request){
 
 	ts, err := template.ParseFiles(files...)
 	if err != nil {
-		app.errorLog.Printf("Error parsing template files: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		app.serverError(w, err)
 		return
 	}
 
 	err = ts.ExecuteTemplate(w, "base", nil)
 	if err != nil {
-		app.errorLog.Printf("Error executing template: %v", err)
-
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		app.serverError(w, err)
 		return
 	}
 
@@ -46,16 +43,15 @@ func (app *application) home(w  http.ResponseWriter, r *http.Request){
 func (app *application) snippetView(w  http.ResponseWriter, r *http.Request){
 	if(r.Method != http.MethodGet){
 		w.Header().Set("Allow", http.MethodGet)
-		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		app.clientError(w, http.StatusMethodNotAllowed)
 		return
 	}
 
 	stringId := r.URL.Query().Get("id")
 
 	if id, err := strconv.Atoi(stringId); err != nil || id < 1 {
-		app.errorLog.Printf("Invalid snippet ID: %v", stringId)
-		
-		http.NotFound(w, r)
+		app.notFound(w)
+
 		return
 	} else {
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
@@ -67,7 +63,8 @@ func (app *application) snippetView(w  http.ResponseWriter, r *http.Request){
 func (app *application) snippetCreate(w http.ResponseWriter, r *http.Request){
 	if(r.Method != http.MethodPost){
 		w.Header().Set("Allow", http.MethodPost)
-		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+
+		app.clientError(w, http.StatusMethodNotAllowed)
 		return
 	}
 
