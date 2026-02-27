@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
 )
 
@@ -27,16 +27,8 @@ func main() {
 	}
 
 	addr := flag.String("addr", defaultAddr, "HTTP network address")
+	dsn := flag.String("dsn", os.Getenv("DATABASE_URL"), "PostgreSQL connection string")
 	flag.Parse()
-
-	// establishes a connection pool to the database
-	
-	db, err := openDB(os.Getenv("DATABASE_URL"))
-	if err != nil {
-		log.Fatalf("Unable to connect to database: %v", err)
-	}
-	
-	defer db.Close(context.Background())
 
 	// establishes dependencies for handlers - loggers
 	infoLog := log.New(os.Stdout, "\033[32mINFO\t\033[0m", log.Ldate|log.Ltime)
@@ -46,6 +38,16 @@ func main() {
 		infoLog:  infoLog,
 		errorLog: errorLog,
 	}
+
+	// establishes a connection pool to the database
+	db, err := openDB(*dsn)
+	if err != nil {
+		errorLog.Fatalf("Unable to connect to database: %v", err)
+	}
+	infoLog.Println("Database connection pool established")
+	defer db.Close()
+
+
 
 	// runs the http server and listens for requests
 	srv := &http.Server{
@@ -63,16 +65,16 @@ func main() {
 }
 
 
-func openDB(dsn string) (*pgx.Conn, error) {
-	conn, err := pgx.Connect(context.Background(), dsn)
+func openDB(dsn string) (*pgxpool.Pool, error) {
+	pool, err := pgxpool.New(context.Background(), dsn)
 	if err != nil {
 		return nil, err
 	}
 
-	err = conn.Ping(context.Background())
+	err = pool.Ping(context.Background())
 	if err != nil {
 		return nil, err
 	}
 
-	return conn, nil
+	return pool, nil
 }
