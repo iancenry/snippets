@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/iancenry/snippetbox/internal/models"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
 )
@@ -14,6 +15,7 @@ import (
 type application struct {
 	infoLog  *log.Logger
 	errorLog *log.Logger
+	snippets *models.SnippetModel
 }
 
 
@@ -30,14 +32,8 @@ func main() {
 	dsn := flag.String("dsn", os.Getenv("DATABASE_URL"), "PostgreSQL connection string")
 	flag.Parse()
 
-	// establishes dependencies for handlers - loggers
 	infoLog := log.New(os.Stdout, "\033[32mINFO\t\033[0m", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stderr, "\033[31mERROR\t\033[0m", log.Ldate|log.Ltime|log.LUTC|log.Lshortfile)
-
-	app := &application{
-		infoLog:  infoLog,
-		errorLog: errorLog,
-	}
 
 	// establishes a connection pool to the database
 	db, err := openDB(*dsn)
@@ -48,6 +44,15 @@ func main() {
 	defer db.Close()
 
 
+	
+	// establishes dependencies for handlers - loggers and database models
+	app := &application{
+		infoLog:  infoLog,
+		errorLog: errorLog,
+		snippets: &models.SnippetModel{DB: db},
+	}
+
+	
 
 	// runs the http server and listens for requests
 	srv := &http.Server{
