@@ -23,10 +23,13 @@ type SnippetModel struct {
 
 func (m *SnippetModel) Insert(title, content string, expires int) (uuid.UUID, error) {
 	var id uuid.UUID
-	err := m.DB.QueryRow(context.Background(), `
+
+	stmt := `
 		INSERT INTO snippets (title, content, created, expires)
 		VALUES ($1, $2, current_timestamp, current_timestamp + interval '1 day' * $3)
-		RETURNING id`, title, content, expires).Scan(&id)
+		RETURNING id`
+		
+	err := m.DB.QueryRow(context.Background(), stmt, title, content, expires).Scan(&id)
 	if err != nil {
 		return uuid.Nil, err
 	}
