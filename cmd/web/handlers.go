@@ -40,6 +40,7 @@ func (app *application) home(w  http.ResponseWriter, r *http.Request){
 		app.serverError(w, err)
 		return
 	}
+	
 
 	// w.Write([]byte("Hello from snippetbox"))
 }
@@ -95,4 +96,21 @@ func (app *application) snippetCreate(w http.ResponseWriter, r *http.Request){
 
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	json.NewEncoder(w).Encode(map[string]string{"message": "Created a new snippet with id: " + id.String()})
+}
+
+func (app *application) snippetLatest(w http.ResponseWriter, r *http.Request){
+	if(r.Method != http.MethodGet){
+		w.Header().Set("Allow", http.MethodGet)
+		app.clientError(w, http.StatusMethodNotAllowed)
+		return
+	}
+
+	snippets, err := app.snippets.Latest()
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	json.NewEncoder(w).Encode(snippets)
 }

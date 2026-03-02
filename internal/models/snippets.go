@@ -23,6 +23,7 @@ type SnippetModel struct {
 	DB *pgxpool.Pool
 }
 
+// inserts a new snippet into the database and returns the id of the newly inserted record
 func (m *SnippetModel) Insert(title, content string, expires int) (uuid.UUID, error) {
 	var id uuid.UUID
  
@@ -38,6 +39,7 @@ func (m *SnippetModel) Insert(title, content string, expires int) (uuid.UUID, er
 	return id, nil
 }
 
+// returns a specific snippet based on its id. Returns a models.ErrNoRecord error if the id is invalid or there is no matching record in the database
 func (m *SnippetModel) Get(id uuid.UUID) (*Snippet, error) {
 	row := m.DB.QueryRow(context.Background(), `
 		SELECT id, title, content, created, expires FROM snippets
@@ -54,6 +56,7 @@ func (m *SnippetModel) Get(id uuid.UUID) (*Snippet, error) {
 	return s, nil
 }
 
+// returns the 10 most recently created snippets that have not yet expired
 func (m *SnippetModel) Latest() ([]*Snippet, error) {
 	rows, err := m.DB.Query(context.Background(), `
 		SELECT id, title, content, created, expires FROM snippets
