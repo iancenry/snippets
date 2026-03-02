@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"html/template"
 	"net/http"
 
 	"github.com/google/uuid"
@@ -23,32 +22,13 @@ func (app *application) home(w  http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	files := []string{
-		"./ui/html/base.tmpl.html",
-		"./ui/html/partials/nav.tmpl.html",
-		"./ui/html/pages/home.tmpl.html",
-	}
-
-	ts, err := template.ParseFiles(files...)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
 	snippets, err := app.snippets.Latest()
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
 
-	data := &templateData{Snippets: snippets}
-
-	err = ts.ExecuteTemplate(w, "base", data)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-	
+	app.render(w, http.StatusOK, "home.tmpl.html", &templateData{Snippets: snippets})
 
 	// w.Write([]byte("Hello from snippetbox"))
 }
@@ -77,26 +57,8 @@ func (app *application) snippetView(w  http.ResponseWriter, r *http.Request){
 		}
 		return
 	}
-
-	files := []string{
-		"./ui/html/base.tmpl.html",
-		"./ui/html/partials/nav.tmpl.html",
-		"./ui/html/pages/view.tmpl.html",
-	}
-
-	ts, err := template.ParseFiles(files...)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
-	data := &templateData{Snippet: snippet}
-
-	err = ts.ExecuteTemplate(w, "base", data)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
+	
+	app.render(w, http.StatusOK, "view.tmpl.html", &templateData{Snippet: snippet})
 
 }
 
