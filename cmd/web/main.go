@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -16,6 +17,7 @@ type application struct {
 	infoLog  *log.Logger
 	errorLog *log.Logger
 	snippets *models.SnippetModel
+	templateCache map[string]*template.Template
 }
 
 
@@ -51,6 +53,13 @@ func main() {
 		errorLog: errorLog,
 		snippets: &models.SnippetModel{DB: db},
 	}
+
+	// create a template cache
+	templateCache, err := newTemplateCache()
+	if err != nil {
+		errorLog.Fatalf("Unable to create template cache: %v", err)
+	}
+	app.templateCache = templateCache
 
 	// runs the http server and listens for requests
 	srv := &http.Server{
