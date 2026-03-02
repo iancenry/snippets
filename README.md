@@ -11,15 +11,18 @@ A web application for sharing text snippets, built with Go. Uses PostgreSQL for 
 │       ├── handlers.go         # HTTP handler functions
 │       ├── helpers.go          # Helper methods (error handling)
 │       ├── main.go             # Application entry point, server config
-│       └── routes.go           # Route definitions and middleware
+│       ├── routes.go           # Route definitions and middleware
+│       └── templates.go        # Template cache for HTML rendering
 ├── internal/
 │   └── models/
+│       ├── errors.go           # Custom error types (ErrNoRecord)
 │       └── snippets.go         # Snippet database model and queries
 ├── ui/
 │   ├── html/
 │   │   ├── base.tmpl.html      # Base layout template
 │   │   ├── pages/
-│   │   │   └── home.tmpl.html  # Home page template
+│   │   │   ├── home.tmpl.html  # Home page template
+│   │   │   └── view.tmpl.html  # Snippet view page template
 │   │   └── partials/
 │   │       └── nav.tmpl.html   # Navigation partial
 │   └── static/                 # Static assets (CSS, JS, images)
@@ -29,12 +32,13 @@ A web application for sharing text snippets, built with Go. Uses PostgreSQL for 
 
 ## Routes
 
-| Method | Path              | Handler         | Description             |
-| ------ | ----------------- | --------------- | ----------------------- |
-| GET    | `/`               | `home`          | Home page               |
-| GET    | `/snippet/view/`  | `snippetView`   | View a specific snippet |
-| POST   | `/snippet/create` | `snippetCreate` | Create a new snippet    |
-| GET    | `/static/`        | `fileServer`    | Serve static assets     |
+| Method | Path              | Handler         | Description                    |
+| ------ | ----------------- | --------------- | ------------------------------ |
+| GET    | `/`               | `home`          | Home page                      |
+| GET    | `/snippet/view/`  | `snippetView`   | View a specific snippet        |
+| POST   | `/snippet/create` | `snippetCreate` | Create a new snippet           |
+| GET    | `/snippets`       | `snippetLatest` | Get latest snippets (JSON API) |
+| GET    | `/static/`        | `fileServer`    | Serve static assets            |
 
 ## Dependencies
 
