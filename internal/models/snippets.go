@@ -2,6 +2,8 @@ package models
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"time"
 
 	"github.com/google/uuid"
@@ -23,7 +25,7 @@ type SnippetModel struct {
 
 func (m *SnippetModel) Insert(title, content string, expires int) (uuid.UUID, error) {
 	var id uuid.UUID
-
+ 
 	stmt := `
 		INSERT INTO snippets (title, content, created, expires)
 		VALUES ($1, $2, current_timestamp, current_timestamp + interval '1 day' * $3)
@@ -44,7 +46,9 @@ func (m *SnippetModel) Get(id uuid.UUID) (*Snippet, error) {
 	s := &Snippet{}
 
 	err := row.Scan(&s.ID, &s.Title, &s.Content, &s.Created, &s.Expires)
-	if err != nil {
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, nil
+	} else if err != nil {
 		return nil, err
 	}
 	return s, nil
@@ -65,7 +69,7 @@ func (m *SnippetModel) Latest() ([]*Snippet, error) {
 		s := &Snippet{}
 		err = rows.Scan(&s.ID, &s.Title, &s.Content, &s.Created, &s.Expires)
 		if err != nil {
-			return nil, err
+			return nil, ErrNoRecord
 		}
 		snippets = append(snippets, s)
 	}

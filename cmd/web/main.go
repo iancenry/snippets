@@ -52,8 +52,6 @@ func main() {
 		snippets: &models.SnippetModel{DB: db},
 	}
 
-	
-
 	// runs the http server and listens for requests
 	srv := &http.Server{
 		Addr:     *addr,
