@@ -91,11 +91,11 @@ func (app *application) snippetCreate(w http.ResponseWriter, r *http.Request){
 }
 
 func (app *application) snippetLatest(w http.ResponseWriter, r *http.Request){
-	if(r.Method != http.MethodGet){
-		w.Header().Set("Allow", http.MethodGet)
-		app.clientError(w, http.StatusMethodNotAllowed)
-		return
-	}
+	// if(r.Method != http.MethodGet){
+	// 	w.Header().Set("Allow", http.MethodGet)
+	// 	app.clientError(w, http.StatusMethodNotAllowed)
+	// 	return
+	// }
 
 	snippets, err := app.snippets.Latest()
 	if err != nil {
