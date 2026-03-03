@@ -9,9 +9,10 @@
     </div>
     <pre><code>{{.Content}}</code></pre>
     <div class='metadata'>
-        <time>Created: {{.Created.Format "02 Jan 2006 15:04"}}</time>
-        <!-- Calling type methods - calling function with argument -->
-        <time>Expires: {{.Expires.Weekday}} - {{humanDate .Expires}}</time>
+        <!-- type method - using pipeing -->
+        <time>Created: {{.Created.Format "02 Jan 2006 15:04"}} - {{.Created | humanDate | printf "Created %s"}}</time>
+        <!-- Calling type methods - calling function with argument  -->
+        <time>Expires: {{.Expires.Weekday}} - {{humanDate .Expires}} </time>
     </div>
 </div>
 {{end}}
