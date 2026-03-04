@@ -5,19 +5,28 @@
 <form action="/snippet/create" method="POST">
     <div>
         <label for="title">Title:</label>
-        <input type="text" id="title" name="title" required>
+        <input type="text" id="title" name="title" value="{{.Form.Title}}" required>
+        {{with .Form.FieldErrors.title}}
+            <p class="error">{{.}}</p>
+        {{end}}
     </div>
     <div>
         <label for="content">Content:</label>
-        <textarea id="content" name="content" rows="10" cols="50" required></textarea>
+        <textarea id="content" name="content" rows="10" cols="50" required>{{.Form.Content}}</textarea>
+        {{with .Form.FieldErrors.content}}
+            <p class="error">{{.}}</p>
+        {{end}}
     </div>
     <div>
         <label for="expires">Expires:</label>
         <select id="expires" name="expires">
-            <option value="1">1 day</option>
-            <option value="7">7 days</option>
-            <option value="365">1 year</option>
+            <option value="1" {{if eq .Form.Expires 1}}selected{{end}}>1 day</option>
+            <option value="7" {{if eq .Form.Expires 7}}selected{{end}}>7 days</option>
+            <option value="365" {{if eq .Form.Expires 365}}selected{{end}}>1 year</option>
         </select>
+        {{with .Form.FieldErrors.expires}}
+            <p class="error">{{.}}</p>
+        {{end}}
     </div>
     <div>
         <label></label>
