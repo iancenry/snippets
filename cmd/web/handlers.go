@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/google/uuid"
 	"github.com/iancenry/snippetbox/internal/models"
@@ -58,26 +59,27 @@ func (app *application) snippetView(w  http.ResponseWriter, r *http.Request){
 
 func (app *application) snippetCreate(w http.ResponseWriter, r *http.Request){
 
-	title := "O snail"
-	content := "O snail\nClimb Mount Fuji,\nBut slowly, slowly!\n\n- Kobayashi Issa"
-	expires := 7
-
-	id, err := app.snippets.Insert(title, content, expires)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	json.NewEncoder(w).Encode(map[string]string{"message": "Created a new snippet with id: " + id.String()})
+	data := app.newTemplateData(r)
+	app.render(w, http.StatusOK, "create.tmpl.html", data)
 }
 
 
 func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request){
 
-	title := "O snail"
-	content := "O snail\nClimb Mount Fuji,\nBut slowly, slowly!\n\n- Kobayashi Issa"
-	expires := 7
+
+	err := r.ParseForm()
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	title := r.PostForm.Get("title")
+	content := r.PostForm.Get("content")
+	expires, err := strconv.Atoi(r.PostForm.Get("expires"))
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
 
 	id, err := app.snippets.Insert(title, content, expires)
 	if err != nil {
