@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/google/uuid"
@@ -31,9 +32,8 @@ func (app *application) home(w  http.ResponseWriter, r *http.Request){
 func (app *application) snippetView(w  http.ResponseWriter, r *http.Request){
 	params := httprouter.ParamsFromContext(r.Context())
 
-	stringId := params.ByName("id")
 
-	id, err := uuid.Parse(stringId)
+	id, err := uuid.Parse(params.ByName("id"))
 	if err != nil {
 		app.notFound(w)
 		return
@@ -85,8 +85,7 @@ func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	json.NewEncoder(w).Encode(map[string]string{"message": "Created a new snippet with id: " + id.String()})
+	http.Redirect(w, r, fmt.Sprintf("/snippet/view/%s", id.String()), http.StatusSeeOther)
 }
 
 
