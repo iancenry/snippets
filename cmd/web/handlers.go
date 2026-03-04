@@ -7,21 +7,11 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/iancenry/snippetbox/internal/models"
+	"github.com/julienschmidt/httprouter"
 )
 
 
 func (app *application) home(w  http.ResponseWriter, r *http.Request){
-	if(r.URL.Path != "/"){
-		app.notFound(w)
-		return
-	}
-
-	if(r.Method != http.MethodGet){
-		w.Header().Set("Allow", http.MethodGet)
-		app.clientError(w, http.StatusMethodNotAllowed)
-		return
-	}
-
 	// panic("Oh no, a problem occurred!")
 
 	snippets, err := app.snippets.Latest()
@@ -39,13 +29,9 @@ func (app *application) home(w  http.ResponseWriter, r *http.Request){
 }
 
 func (app *application) snippetView(w  http.ResponseWriter, r *http.Request){
-	if(r.Method != http.MethodGet){
-		w.Header().Set("Allow", http.MethodGet)
-		app.clientError(w, http.StatusMethodNotAllowed)
-		return
-	}
+	params := httprouter.ParamsFromContext(r.Context())
 
-	stringId := r.URL.Query().Get("id")
+	stringId := params.ByName("id")
 
 	id, err := uuid.Parse(stringId)
 	if err != nil {
@@ -71,12 +57,6 @@ func (app *application) snippetView(w  http.ResponseWriter, r *http.Request){
 }
 
 func (app *application) snippetCreate(w http.ResponseWriter, r *http.Request){
-	if(r.Method != http.MethodPost){
-		w.Header().Set("Allow", http.MethodPost)
-
-		app.clientError(w, http.StatusMethodNotAllowed)
-		return
-	}
 
 	title := "O snail"
 	content := "O snail\nClimb Mount Fuji,\nBut slowly, slowly!\n\n- Kobayashi Issa"
@@ -92,13 +72,25 @@ func (app *application) snippetCreate(w http.ResponseWriter, r *http.Request){
 	json.NewEncoder(w).Encode(map[string]string{"message": "Created a new snippet with id: " + id.String()})
 }
 
-func (app *application) snippetLatest(w http.ResponseWriter, r *http.Request){
-	// if(r.Method != http.MethodGet){
-	// 	w.Header().Set("Allow", http.MethodGet)
-	// 	app.clientError(w, http.StatusMethodNotAllowed)
-	// 	return
-	// }
 
+func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request){
+
+	title := "O snail"
+	content := "O snail\nClimb Mount Fuji,\nBut slowly, slowly!\n\n- Kobayashi Issa"
+	expires := 7
+
+	id, err := app.snippets.Insert(title, content, expires)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	json.NewEncoder(w).Encode(map[string]string{"message": "Created a new snippet with id: " + id.String()})
+}
+
+
+func (app *application) snippetLatest(w http.ResponseWriter, r *http.Request){
 	snippets, err := app.snippets.Latest()
 	if err != nil {
 		app.serverError(w, err)
