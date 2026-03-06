@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/go-playground/form"
 	"github.com/iancenry/snippetbox/internal/models"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
@@ -18,6 +19,7 @@ type application struct {
 	errorLog *log.Logger
 	snippets *models.SnippetModel
 	templateCache map[string]*template.Template
+	formDecoder *form.Decoder
 }
 
 
@@ -52,6 +54,7 @@ func main() {
 		infoLog:  infoLog,
 		errorLog: errorLog,
 		snippets: &models.SnippetModel{DB: db},
+		formDecoder: form.NewDecoder(),
 	}
 
 	// create a template cache

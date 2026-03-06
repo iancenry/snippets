@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/google/uuid"
 	"github.com/iancenry/snippetbox/internal/models"
@@ -14,10 +13,10 @@ import (
 )
 
 type SnippetCreateForm struct {
-	Title string 
-	Content string 
-	Expires int 
-	validator.Validator
+	Title string  `form:"title"`
+	Content string `form:"content"`
+	Expires int `form:"expires"`
+	validator.Validator `form:"-"`
 }
 
 
@@ -82,18 +81,13 @@ func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	expires, err := strconv.Atoi(r.PostForm.Get("expires"))
+	var form SnippetCreateForm
+
+	err = app.formDecoder.Decode(&form, r.PostForm)
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
 		return
 	}
-
-	form := SnippetCreateForm{
-		Title: r.PostForm.Get("title"),
-		Content: r.PostForm.Get("content"),
-		Expires: expires,
-	}
-
 
 	form.Check(validator.NotBlank(form.Title), "title", "This field cannot be blank")
 	form.Check(validator.MaxChars(form.Title, 100), "title", "This field cannot be more than 100 characters long")
