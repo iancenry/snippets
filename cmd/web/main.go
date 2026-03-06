@@ -7,7 +7,10 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
+	"github.com/alexedwards/scs/pgxstore"
+	"github.com/alexedwards/scs/v2"
 	"github.com/go-playground/form"
 	"github.com/iancenry/snippetbox/internal/models"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -20,6 +23,7 @@ type application struct {
 	snippets *models.SnippetModel
 	templateCache map[string]*template.Template
 	formDecoder *form.Decoder
+	sessionManager *scs.SessionManager
 }
 
 
@@ -47,6 +51,12 @@ func main() {
 	infoLog.Println("Database connection pool established")
 	defer db.Close()
 
+	// initializes a new session manager and configures it to use the PostgreSQL database as the session store
+	sessionManager := scs.New()
+	sessionManager.Store = pgxstore.New(db)
+	sessionManager.Lifetime = 12 * time.Hour
+	sessionManager.Cookie.Secure = true
+
 
 	
 	// establishes dependencies for handlers - loggers and database models
@@ -55,6 +65,7 @@ func main() {
 		errorLog: errorLog,
 		snippets: &models.SnippetModel{DB: db},
 		formDecoder: form.NewDecoder(),
+		sessionManager: sessionManager,
 	}
 
 	// create a template cache
