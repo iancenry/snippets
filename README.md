@@ -5,6 +5,7 @@ A web application for sharing text snippets, built with Go. Uses PostgreSQL for 
 ## Features
 
 - Create, view, and list text snippets with configurable expiry (1 day, 7 days, or 1 year)
+- HTTPS/TLS encryption
 - Server-side session management with PostgreSQL-backed session store
 - Flash messages for user feedback
 - Form validation with error display
@@ -30,6 +31,9 @@ A web application for sharing text snippets, built with Go. Uses PostgreSQL for 
 │   │   └── snippets.go         # Snippet database model and queries
 │   └── validator/
 │       └── validator.go        # Form validation helpers
+├── tls/                        # TLS certificates (not committed)
+│   ├── cert.pem                # TLS certificate
+│   └── key.pem                 # TLS private key
 ├── ui/
 │   ├── html/
 │   │   ├── base.tmpl.html      # Base layout template
@@ -95,6 +99,17 @@ Create a `.env` file in the project root or export the variables directly.
 
 ### Running the Application
 
+Generate TLS certificates (for development):
+
+```bash
+mkdir -p tls
+cd tls
+go run /usr/local/go/src/crypto/tls/generate_cert.go --rsa-bits=2048 --host=localhost
+cd ..
+```
+
+Start the server:
+
 ```bash
 go run ./cmd/web
 ```
@@ -104,7 +119,7 @@ Flags:
 - `-addr` — HTTP network address (overrides `SNIPPETBOX_ADDR`)
 - `-dsn` — PostgreSQL connection string (overrides `DATABASE_URL`)
 
-The server starts on `http://127.0.0.1:4000` by default.
+The server starts on `https://localhost:4000` by default.
 
 ### Development with Hot Reload
 

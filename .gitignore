@@ -28,3 +28,6 @@ Thumbs.db
 # Environment files
 .env
 .env.local
+
+# TLS certificates (for development)
+tls/
