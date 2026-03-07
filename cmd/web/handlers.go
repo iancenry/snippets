@@ -118,3 +118,23 @@ func (app *application) snippetLatest(w http.ResponseWriter, r *http.Request){
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	json.NewEncoder(w).Encode(snippets)
 }
+
+func (app *application) userSignup(w http.ResponseWriter, r *http.Request){
+	fmt.Fprintln(w, "Display a HTML form for signing up users")
+}
+
+func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request){
+	fmt.Fprintln(w, "Process the submitted form and create a new user in the database")
+}
+
+func (app *application) userLogin(w http.ResponseWriter, r *http.Request){
+	fmt.Fprintln(w, "Display a HTML form for logging in users")
+}
+
+func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request){
+	fmt.Fprintln(w, "Process the submitted form and authenticate the user")
+}
+
+func (app *application) userLogoutPost(w http.ResponseWriter, r *http.Request){
+	fmt.Fprintln(w, "Log out the user and end their session")
+}
