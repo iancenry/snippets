@@ -69,7 +69,7 @@ A web application for sharing text snippets, built with Go. Uses PostgreSQL for 
 | Package                    | Purpose                                |
 | -------------------------- | -------------------------------------- |
 | `jackc/pgx/v5`             | PostgreSQL driver & connection pool    |
-| `alexedwards/scs/v2`       | Session management                     |
+| `alexedwards/scs/v2`       | Session management; PRG pattern        |
 | `alexedwards/scs/pgxstore` | PostgreSQL session store               |
 | `julienschmidt/httprouter` | HTTP request router                    |
 | `justinas/alice`           | Middleware chaining                    |
