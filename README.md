@@ -5,6 +5,7 @@ A web application for sharing text snippets, built with Go. Uses PostgreSQL for 
 ## Features
 
 - Create, view, and list text snippets with configurable expiry (1 day, 7 days, or 1 year)
+- User authentication (signup, login, logout) with bcrypt password hashing
 - HTTPS/TLS encryption
 - Server-side session management with PostgreSQL-backed session store
 - Flash messages for user feedback
@@ -27,8 +28,9 @@ A web application for sharing text snippets, built with Go. Uses PostgreSQL for 
 │       └── templates.go        # Template cache for HTML rendering
 ├── internal/
 │   ├── models/
-│   │   ├── errors.go           # Custom error types (ErrNoRecord)
-│   │   └── snippets.go         # Snippet database model and queries
+│   │   ├── errors.go           # Custom error types (ErrNoRecord, ErrInvalidCredentials)
+│   │   ├── snippets.go         # Snippet database model and queries
+│   │   └── users.go            # User database model and authentication
 │   └── validator/
 │       └── validator.go        # Form validation helpers
 ├── tls/                        # TLS certificates (not committed)
@@ -57,6 +59,11 @@ A web application for sharing text snippets, built with Go. Uses PostgreSQL for 
 | GET    | `/snippet/create`   | `snippetCreate`     | Show snippet creation form     |
 | POST   | `/snippet/create`   | `snippetCreatePost` | Handle snippet form submission |
 | GET    | `/snippets`         | `snippetLatest`     | Get latest snippets (JSON API) |
+| GET    | `/user/signup`      | `userSignup`        | Show user registration form    |
+| POST   | `/user/signup`      | `userSignupPost`    | Handle user registration       |
+| GET    | `/user/login`       | `userLogin`         | Show login form                |
+| POST   | `/user/login`       | `userLoginPost`     | Handle user login              |
+| POST   | `/user/logout`      | `userLogoutPost`    | Log out user                   |
 | GET    | `/static/*filepath` | `fileServer`        | Serve static assets            |
 
 ## Middleware
@@ -80,6 +87,7 @@ A web application for sharing text snippets, built with Go. Uses PostgreSQL for 
 | `go-playground/form`       | Form decoding                          |
 | `joho/godotenv`            | Load environment variables from `.env` |
 | `google/uuid`              | UUID generation for snippet IDs        |
+| `golang.org/x/crypto`      | bcrypt password hashing                |
 
 ## Getting Started
 
