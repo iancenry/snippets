@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"crypto/tls"
+	"encoding/gob"
 	"flag"
 	"html/template"
 	"log"
@@ -13,6 +14,7 @@ import (
 	"github.com/alexedwards/scs/pgxstore"
 	"github.com/alexedwards/scs/v2"
 	"github.com/go-playground/form"
+	"github.com/google/uuid"
 	"github.com/iancenry/snippetbox/internal/models"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
@@ -31,6 +33,7 @@ type application struct {
 
 
 func main() {
+	gob.Register(uuid.UUID{})
 	godotenv.Load()
 	// parses runtime config settings for the app
 	defaultAddr := os.Getenv("SNIPPETBOX_ADDR")
