@@ -2,11 +2,12 @@ package models
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -38,6 +39,10 @@ func (m *UserModel) Insert(name, email, password string) (uuid.UUID, error) {
 
 	err = m.DB.QueryRow(context.Background(), stmt, name, email, hashedPassword).Scan(&id)
 	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
+			return uuid.Nil, ErrDuplicateEmail
+		}
 		return uuid.Nil, err
 	}
 	return id, nil
@@ -52,7 +57,7 @@ func (m *UserModel) Authenticate(email, password string) (uuid.UUID, error) {
 
 	err := row.Scan(&id, &hashedPassword)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return uuid.Nil, ErrInvalidCredentials
 		} else {
 			return uuid.Nil, err
@@ -78,7 +83,7 @@ func (m *UserModel) Exists(id uuid.UUID) (*User, error) {
 	u := &User{}
 
 	err := row.Scan(&u.ID, &u.Name, &u.Email, &u.HashedPassword)
-	if errors.Is(err, sql.ErrNoRows) {
+	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, nil
 	} else if err != nil {
 		return nil, err
