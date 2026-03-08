@@ -42,6 +42,8 @@ A web application for sharing text snippets, built with Go. Uses PostgreSQL for 
 │   │   ├── pages/
 │   │   │   ├── create.tmpl.html # Snippet creation form
 │   │   │   ├── home.tmpl.html   # Home page template
+│   │   │   ├── login.tmpl.html  # User login form
+│   │   │   ├── signup.tmpl.html # User registration form
 │   │   │   └── view.tmpl.html   # Snippet view page template
 │   │   └── partials/
 │   │       └── nav.tmpl.html   # Navigation partial
