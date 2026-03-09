@@ -77,6 +77,7 @@ A web application for sharing text snippets, built with Go. Uses PostgreSQL for 
 | `recoverPanic`          | Recovers from panics and returns 500 error         |
 | `LoadAndSave`           | Session management (load/save session data)        |
 | `noSurf`                | CSRF protection                                    |
+| `authenticate`          | Checks session and sets authentication context     |
 | `requireAuthentication` | Redirects unauthenticated users to login page      |
 
 ## Dependencies
