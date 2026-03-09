@@ -54,28 +54,29 @@ A web application for sharing text snippets, built with Go. Uses PostgreSQL for 
 
 ## Routes
 
-| Method | Path                | Handler             | Description                    |
-| ------ | ------------------- | ------------------- | ------------------------------ |
-| GET    | `/`                 | `home`              | Home page (lists snippets)     |
-| GET    | `/snippet/view/:id` | `snippetView`       | View a specific snippet        |
-| GET    | `/snippet/create`   | `snippetCreate`     | Show snippet creation form     |
-| POST   | `/snippet/create`   | `snippetCreatePost` | Handle snippet form submission |
-| GET    | `/snippets`         | `snippetLatest`     | Get latest snippets (JSON API) |
-| GET    | `/user/signup`      | `userSignup`        | Show user registration form    |
-| POST   | `/user/signup`      | `userSignupPost`    | Handle user registration       |
-| GET    | `/user/login`       | `userLogin`         | Show login form                |
-| POST   | `/user/login`       | `userLoginPost`     | Handle user login              |
-| POST   | `/user/logout`      | `userLogoutPost`    | Log out user                   |
-| GET    | `/static/*filepath` | `fileServer`        | Serve static assets            |
+| Method | Path                | Handler             | Auth | Description                    |
+| ------ | ------------------- | ------------------- | ---- | ------------------------------ |
+| GET    | `/`                 | `home`              | No   | Home page (lists snippets)     |
+| GET    | `/snippet/view/:id` | `snippetView`       | No   | View a specific snippet        |
+| GET    | `/snippet/create`   | `snippetCreate`     | Yes  | Show snippet creation form     |
+| POST   | `/snippet/create`   | `snippetCreatePost` | Yes  | Handle snippet form submission |
+| GET    | `/snippets`         | `snippetLatest`     | Yes  | Get latest snippets (JSON API) |
+| GET    | `/user/signup`      | `userSignup`        | No   | Show user registration form    |
+| POST   | `/user/signup`      | `userSignupPost`    | No   | Handle user registration       |
+| GET    | `/user/login`       | `userLogin`         | No   | Show login form                |
+| POST   | `/user/login`       | `userLoginPost`     | No   | Handle user login              |
+| POST   | `/user/logout`      | `userLogoutPost`    | Yes  | Log out user                   |
+| GET    | `/static/*filepath` | `fileServer`        | No   | Serve static assets            |
 
 ## Middleware
 
-| Middleware      | Description                                        |
-| --------------- | -------------------------------------------------- |
-| `secureHeaders` | Sets security headers (CSP, X-Frame-Options, etc.) |
-| `logRequest`    | Logs incoming HTTP requests                        |
-| `recoverPanic`  | Recovers from panics and returns 500 error         |
-| `LoadAndSave`   | Session management (load/save session data)        |
+| Middleware              | Description                                        |
+| ----------------------- | -------------------------------------------------- |
+| `secureHeaders`         | Sets security headers (CSP, X-Frame-Options, etc.) |
+| `logRequest`            | Logs incoming HTTP requests                        |
+| `recoverPanic`          | Recovers from panics and returns 500 error         |
+| `LoadAndSave`           | Session management (load/save session data)        |
+| `requireAuthentication` | Redirects unauthenticated users to login page      |
 
 ## Dependencies
 
