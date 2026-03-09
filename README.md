@@ -10,9 +10,11 @@ A web application for sharing text snippets, built with Go. Uses PostgreSQL for 
 - Server-side session management with PostgreSQL-backed session store
 - Flash messages for user feedback
 - Form validation with error display
+- CSRF protection
 - Security headers (CSP, X-Frame-Options, etc.)
 - Request logging and panic recovery middleware
 - RESTful JSON API endpoint
+- Embedded filesystem for templates and static assets
 
 ## Project Structure
 
@@ -37,6 +39,7 @@ A web application for sharing text snippets, built with Go. Uses PostgreSQL for 
 │   ├── cert.pem                # TLS certificate
 │   └── key.pem                 # TLS private key
 ├── ui/
+│   ├── efs.go                  # Embedded filesystem for templates and static files
 │   ├── html/
 │   │   ├── base.tmpl.html      # Base layout template
 │   │   ├── pages/
@@ -134,6 +137,32 @@ Flags:
 - `-dsn` — PostgreSQL connection string (overrides `DATABASE_URL`)
 
 The server starts on `https://localhost:4000` by default.
+
+### Building the Application
+
+Build a standalone binary:
+
+```bash
+go build -o snippetbox ./cmd/web
+```
+
+Run the compiled binary:
+
+```bash
+./snippetbox
+```
+
+For a production build with optimizations:
+
+```bash
+go build -ldflags="-s -w" -o snippetbox ./cmd/web
+```
+
+**Note:** TLS certificates are not embedded in the binary. Copy the `tls/` directory alongside the binary when deploying:
+
+```bash
+cp -r tls/ /path/to/deployment/
+```
 
 ### Development with Hot Reload
 
