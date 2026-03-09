@@ -76,17 +76,15 @@ func (m *UserModel) Authenticate(email, password string) (uuid.UUID, error) {
 	return id, nil
 }
 
-func (m *UserModel) Exists(id uuid.UUID) (*User, error) {
+func (m *UserModel) Exists(id uuid.UUID) (bool, error) {
+	var exists bool
+
 	row := m.DB.QueryRow(context.Background(), `
-		SELECT id, name, email, hashed_password FROM users WHERE id = $1`, id)
+		SELECT EXISTS(SELECT true FROM users WHERE id = $1)`, id)
 
-	u := &User{}
-
-	err := row.Scan(&u.ID, &u.Name, &u.Email, &u.HashedPassword)
-	if errors.Is(err, pgx.ErrNoRows) {
-		return nil, nil
-	} else if err != nil {
-		return nil, err
+	err := row.Scan(&exists)
+	if err != nil {
+		return false, err
 	}
-	return u, nil
+	return exists, nil
 }

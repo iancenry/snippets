@@ -76,6 +76,7 @@ A web application for sharing text snippets, built with Go. Uses PostgreSQL for 
 | `logRequest`            | Logs incoming HTTP requests                        |
 | `recoverPanic`          | Recovers from panics and returns 500 error         |
 | `LoadAndSave`           | Session management (load/save session data)        |
+| `noSurf`                | CSRF protection                                    |
 | `requireAuthentication` | Redirects unauthenticated users to login page      |
 
 ## Dependencies
@@ -87,6 +88,7 @@ A web application for sharing text snippets, built with Go. Uses PostgreSQL for 
 | `alexedwards/scs/pgxstore` | PostgreSQL session store               |
 | `julienschmidt/httprouter` | HTTP request router                    |
 | `justinas/alice`           | Middleware chaining                    |
+| `justinas/nosurf`          | CSRF protection                        |
 | `go-playground/form`       | Form decoding                          |
 | `joho/godotenv`            | Load environment variables from `.env` |
 | `google/uuid`              | UUID generation for snippet IDs        |

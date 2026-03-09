@@ -1,9 +1,11 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
+	"github.com/google/uuid"
 	"github.com/justinas/nosurf"
 )
 
@@ -63,5 +65,32 @@ func noSurf(next http.Handler) http.Handler {
 			Secure:   true,
 		})
 		csrfHandler.ServeHTTP(w, r)
+	})
+}
+
+// authenticate checks if the current request is from an authenticated user. 
+// If it is, then the isAuthenticated value is added to the request context with a value of true.
+//  This allows us to check if the user is authenticated in our handlers and templates.
+func (app *application) authenticate(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		id, ok := app.sessionManager.Get(r.Context(), "authenticatedUserID").(uuid.UUID)
+		if !ok {
+			next.ServeHTTP(w, r)
+			return
+		}
+
+		exists, err := app.users.Exists(id)
+		if err != nil {
+			app.serverError(w, err)
+			return
+		}
+
+		if exists {
+			// Add the isAuthenticated value to the request context. 
+			ctx := context.WithValue(r.Context(), contextKeyIsAuthenticated, true)
+			r = r.WithContext(ctx)
+		}
+
+		next.ServeHTTP(w, r)
 	})
 }

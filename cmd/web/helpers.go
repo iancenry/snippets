@@ -59,7 +59,12 @@ func (app *application) newTemplateData(r *http.Request) *templateData {
 }
 
 func (app *application) isAuthenticated(r *http.Request) bool {
-	return app.sessionManager.Exists(r.Context(), "authenticatedUserID")
+	isAuthenticated, ok := r.Context().Value(contextKeyIsAuthenticated).(bool)
+	if !ok {
+		return false
+	}
+
+	return isAuthenticated 
 }
 
 func (app *application) decodePostForm(r *http.Request, dst any) error {
