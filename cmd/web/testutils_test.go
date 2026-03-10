@@ -1,11 +1,17 @@
 package main
 
 import (
+	"bytes"
+	"fmt"
+	"html"
 	"io"
 	"log"
 	"net/http"
 	"net/http/cookiejar"
 	"net/http/httptest"
+	"net/url"
+	"regexp"
+	"strings"
 	"testing"
 	"time"
 
@@ -77,3 +83,39 @@ func (ts *testServer) get(t *testing.T, urlPath string) (int, http.Header, []byt
 
 	return rs.StatusCode, rs.Header, body
 }
+
+func (ts *testServer) postForm(t *testing.T, urlPath string, formData url.Values) (int, http.Header, string) {
+	req, err := http.NewRequest("POST", ts.URL+urlPath, strings.NewReader(formData.Encode()))
+	if err != nil {
+		t.Fatal(err)
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("Referer", ts.URL+urlPath)
+
+	rs, err := ts.Client().Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer rs.Body.Close()
+
+	body, err := io.ReadAll(rs.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+	body = bytes.TrimSpace(body)
+
+	fmt.Println(rs.StatusCode)
+	return rs.StatusCode, rs.Header, string(body)
+}
+
+var csrfTokenRX = regexp.MustCompile(`<input type="hidden" name="csrf_token" value="(.+)">`)
+
+func extractCSRFToken(t *testing.T, body string) string {
+	matches := csrfTokenRX.FindStringSubmatch(body)
+	if len(matches) < 2 {
+		t.Fatal("no CSRF token found in body")
+	}
+
+	return html.UnescapeString(string(matches[1]))
+}
+

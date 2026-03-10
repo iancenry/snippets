@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"net/url"
 	"testing"
 
 	"github.com/iancenry/snippetbox/internal/assert"
@@ -72,4 +73,121 @@ func TestSnippetView(t *testing.T) {
 			assert.StringContains(t, string(body), tt.expectedBody)
 		})
 	}
+}
+
+func TestUserSignup(t *testing.T) {
+	app := newTestApplication()
+
+	ts := newTestServer(t, app.routes())
+	defer ts.Close()
+
+	_, _, body := ts.get(t, "/user/signup")
+	csrfToken := extractCSRFToken(t, string(body))
+
+	const (
+		name = "Test User"
+		email = "testuser@example.com"
+		password = "correctpassword"
+		formTag = `<form action='/user/signup' method='POST' novalidate>`
+	)
+
+	tests := []struct {	
+		name string
+		userName string
+		userEmail string
+		userPassword string
+		csrfToken string
+		expectedCode int
+		expectedFormTag string
+	}{
+		{
+			name: "valid form submission",
+			userName: name,
+			userEmail: email,
+			userPassword: password,
+			csrfToken: csrfToken,
+			expectedCode: http.StatusSeeOther,
+		},
+		{
+			name: "Invalid CSRF token",
+			userName: name,
+			userEmail: email,
+			userPassword: password,
+			csrfToken: "invalidtoken",
+			expectedCode: http.StatusBadRequest,
+		},
+		{
+			name: "Empty name field",
+			userName: "",
+			userEmail: email,
+			userPassword: password,
+			csrfToken: csrfToken,
+			expectedCode: http.StatusUnprocessableEntity,
+			expectedFormTag: formTag,
+		},
+		{
+			name: "Empty email field",
+			userName: name,
+			userEmail: "",
+			userPassword: password,
+			csrfToken: csrfToken,
+			expectedCode: http.StatusUnprocessableEntity,
+			expectedFormTag: formTag,
+		},
+		{
+			name: "Empty password field",
+			userName: name,
+			userEmail: email,
+			userPassword: "",
+			csrfToken: csrfToken,
+			expectedCode: http.StatusUnprocessableEntity,
+			expectedFormTag: formTag,
+		},
+		{
+			name: "Invalid email format",
+			userName: name,
+			userEmail: "invalid-email",
+			userPassword: password,
+			csrfToken: csrfToken,
+			expectedCode: http.StatusUnprocessableEntity,
+			expectedFormTag: formTag,
+		},
+		{
+			name: "Short password",
+			userName: name,
+			userEmail: email,
+			userPassword: "short",
+			csrfToken: csrfToken,
+			expectedCode: http.StatusUnprocessableEntity,
+			expectedFormTag: formTag,
+		},
+		{
+			name: "Duplicate email",
+			userName: name,
+			userEmail: "dupe@example.com",
+			userPassword: password,
+			csrfToken: csrfToken,
+			expectedCode: http.StatusUnprocessableEntity,
+			expectedFormTag: formTag,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			formData := url.Values{
+				"name": {tt.userName},
+				"email": {tt.userEmail},
+				"password": {tt.userPassword},
+				"csrf_token": {tt.csrfToken},
+			}
+
+			code, _, body := ts.postForm(t, "/user/signup", formData)
+			assert.Equal(t, code, tt.expectedCode)
+
+			if tt.expectedFormTag != "" {
+				assert.StringContains(t, string(body), tt.expectedFormTag)
+			}
+		})
+	}
+		
 }
