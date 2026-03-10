@@ -20,6 +20,12 @@ type User struct {
 	Created time.Time
 }
 
+type UserModelInterface interface {
+	Insert(name, email, password string) (uuid.UUID, error)
+	Authenticate(email, password string) (uuid.UUID, error)
+	Exists(id uuid.UUID) (bool, error)
+}
+
 type UserModel struct {
 	DB *pgxpool.Pool
 }

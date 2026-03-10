@@ -18,7 +18,7 @@ var mockSnippet = &models.Snippet{
 
 type SnippetModel struct {}
 
-func (m *SnippetModel) Insert(title, content, expires string) (uuid.UUID, error){
+func (m *SnippetModel) Insert(title, content string, expires int) (uuid.UUID, error){
 	return uuid.MustParse("00000000-0000-0000-0000-000000000001"), nil
 }
 

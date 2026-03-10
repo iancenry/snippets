@@ -18,6 +18,12 @@ type Snippet struct {
 	Expires time.Time
 }
 
+type SnippetModelInterface interface {
+	Insert(title, content string, expires int) (uuid.UUID, error)
+	Get(id uuid.UUID) (*Snippet, error)
+	Latest() ([]*Snippet, error)
+}
+
 // wraps a sql.DB connection pool and exposes methods for working with snippets data
 type SnippetModel struct {
 	DB *pgxpool.Pool

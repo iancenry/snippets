@@ -15,6 +15,7 @@ A web application for sharing text snippets, built with Go. Uses PostgreSQL for 
 - Request logging and panic recovery middleware
 - RESTful JSON API endpoint
 - Embedded filesystem for templates and static assets
+- Unit testing with mock models
 
 ## Project Structure
 
@@ -32,6 +33,9 @@ A web application for sharing text snippets, built with Go. Uses PostgreSQL for 
 │   ├── assert/
 │   │   └── assert.go           # Generic test assertion helpers
 │   ├── models/
+│   │   ├── mocks/              # Mock models for testing
+│   │   │   ├── snippets.go     # Mock snippet model
+│   │   │   └── users.go        # Mock user model
 │   │   ├── errors.go           # Custom error types (ErrNoRecord, ErrInvalidCredentials)
 │   │   ├── snippets.go         # Snippet database model and queries
 │   │   └── users.go            # User database model and authentication
@@ -62,6 +66,7 @@ A web application for sharing text snippets, built with Go. Uses PostgreSQL for 
 | Method | Path                | Handler             | Auth | Description                    |
 | ------ | ------------------- | ------------------- | ---- | ------------------------------ |
 | GET    | `/`                 | `home`              | No   | Home page (lists snippets)     |
+| GET    | `/ping`             | `ping`              | No   | Health check endpoint          |
 | GET    | `/snippet/view/:id` | `snippetView`       | No   | View a specific snippet        |
 | GET    | `/snippet/create`   | `snippetCreate`     | Yes  | Show snippet creation form     |
 | POST   | `/snippet/create`   | `snippetCreatePost` | Yes  | Handle snippet form submission |
