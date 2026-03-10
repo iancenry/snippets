@@ -29,6 +29,8 @@ A web application for sharing text snippets, built with Go. Uses PostgreSQL for 
 │       ├── routes.go           # Route definitions and middleware chains
 │       └── templates.go        # Template cache for HTML rendering
 ├── internal/
+│   ├── assert/
+│   │   └── assert.go           # Generic test assertion helpers
 │   ├── models/
 │   │   ├── errors.go           # Custom error types (ErrNoRecord, ErrInvalidCredentials)
 │   │   ├── snippets.go         # Snippet database model and queries
