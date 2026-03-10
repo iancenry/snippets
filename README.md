@@ -164,6 +164,20 @@ go build -ldflags="-s -w" -o snippetbox ./cmd/web
 cp -r tls/ /path/to/deployment/
 ```
 
+### Running Tests
+
+Run all tests:
+
+```bash
+go test ./...
+```
+
+Run tests with verbose output:
+
+```bash
+go test -v ./cmd/web
+```
+
 ### Development with Hot Reload
 
 ```bash
